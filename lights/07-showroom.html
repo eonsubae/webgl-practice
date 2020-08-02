@@ -11,6 +11,7 @@
 
   <!-- modules -->
   <script type="text/javascript" src="/common/js/utils.js"></script>
+  <script type="text/javascript" src="/common/js/Program.js"></script>
 
   <!-- vertex Shader -->
   <script id="vertex-shader" type="x-shader/x-vertex">
@@ -105,33 +106,29 @@
       gl.enable(gl.DEPTH_TEST);
       gl.depthFunc(gl.LEQUAL);
 
-      // Shader source
-      const vertexShader = utils.getShader(gl, 'vertex-shader');
-      const fragementShader = utils.getShader(gl, 'fragment-shader');
+      // Configure program
+      program = new Program(gl, 'vertex-shader', 'fragment-shader');
 
-      // Configure `program`
-      program = gl.createProgram();
-      gl.attachShader(program, vertexShader);
-      gl.attachShader(program, fragementShader);
-      gl.linkProgram(program);
+      // Attributes to be loaded into program
+      const attributes = [
+        'aVertexPosition',
+        'aVertexNormal'
+      ];
 
-      if (!gl.getProgramParameter(program, gl.LINK_STATUS)) {
-        console.error('Could not initialize shaders');
-      }
+      // Uniforms to be loaded into program
+      const uniforms = [
+        'uProjectionMatrix',
+        'uModelViewMatrix',
+        'uNormalMatrix',
+        'uLightAmbient',
+        'uLightPosition',
+        'uMaterialSpecular',
+        'uMaterialDiffuse',
+        'uShininess'
+      ];
 
-      gl.useProgram(program);
-
-      // Set locations onto `program` for later access
-      program.aVertexPosition = gl.getAttribLocation(program, 'aVertexPosition');
-      program.aVertexNormal = gl.getAttribLocation(program, 'aVertexNormal');
-      program.uProjectionMatrix = gl.getUniformLocation(program, 'uProjectionMatrix');
-      program.uModelViewMatrix = gl.getUniformLocation(program, 'uModelViewMatrix');
-      program.uNormalMatrix = gl.getUniformLocation(program, 'uNormalMatrix');
-      program.uLightAmbient = gl.getUniformLocation(program, 'uLightAmbient');
-      program.uLightPosition = gl.getUniformLocation(program, 'uLightPosition');
-      program.uMaterialSpecular = gl.getUniformLocation(program, 'uMaterialSpecular');
-      program.uMaterialDiffuse = gl.getUniformLocation(program, 'uMaterialDiffuse');
-      program.uShininess = gl.getUniformLocation(program, 'uShininess');
+      // Load attributes and uniforms
+      program.load(attributes, uniforms);
     }
 
     // Configure lights
@@ -139,7 +136,7 @@
       gl.uniform3fv(program.uLightPosition, lightPosition);
       gl.uniform3f(program.uLightAmbient, 0.1, 0.1, 0.1);
       gl.uniform3f(program.uMaterialSpecular, 0.5, 0.5, 0.5);
-      gl.uniform3f(program.uMaterialDiffuse, 1, 1, 1);
+      gl.uniform3f(program.uMaterialDiffuse, 0.8, 0.8, 0.8);
       gl.uniform1f(program.uShininess, shininess);
     }
 
